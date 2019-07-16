@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
@@ -19,6 +20,7 @@ import 'todo_test_page.dart';
 import 'type_test_page.dart';
 
 void main() {
+  debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   runApp(MyApp());
 }
 

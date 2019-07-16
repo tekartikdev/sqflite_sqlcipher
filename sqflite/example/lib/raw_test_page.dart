@@ -497,6 +497,9 @@ class RawTestPage extends TestPage {
       }
     });
 
+    bool _isDekstop(){
+      return Platform.isLinux || Platform.isWindows || Platform.isMacOS;
+    }
     test("without rowid", () async {
       // Sqflite.devSetDebugModeOn(true);
       // this fails on iOS
@@ -511,14 +514,14 @@ class RawTestPage extends TestPage {
             .execute("CREATE TABLE Test (name TEXT PRIMARY KEY) WITHOUT ROWID");
         int id = await db.insert("Test", {"name": "test"});
         // it seems to always return 1 on Android, 0 on iOS...
-        if (Platform.isIOS) {
+        if (Platform.isIOS || _isDekstop()) {
           expect(id, 0);
         } else {
           expect(id, 1);
         }
         id = await db.insert("Test", {"name": "other"});
         // it seems to always return 1
-        if (Platform.isIOS) {
+        if (Platform.isIOS || _isDekstop()) {
           expect(id, 0);
         } else {
           expect(id, 1);

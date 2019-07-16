@@ -7,7 +7,9 @@ Future<T> wrapDatabaseException<T>(Future<T> action()) async {
     final T result = await action();
     return result;
   } on PlatformException catch (e) {
-    if (e.code == sqliteErrorCode) {
+    if (e.code == sqliteErrorCode || 
+        // Go-Flutter doesn't handle custom error codes, it returns error
+        e.code == "error") {
       throw SqfliteDatabaseException(e.message, e.details);
       //rethrow;
     } else {
