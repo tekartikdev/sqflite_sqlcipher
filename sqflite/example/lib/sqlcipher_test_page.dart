@@ -12,8 +12,6 @@ class SqlCipherTestPage extends TestPage {
     test('Open and query database', () async {
       String path = await initDeleteDb("encrypted.db");
 
-      expect(await isDatabase(path), isFalse);
-
       const String password = "1234";
 
       Database db = await openDatabase(

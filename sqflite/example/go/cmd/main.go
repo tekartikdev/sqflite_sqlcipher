@@ -9,7 +9,8 @@ import (
 	"strings"
 
 	"github.com/go-flutter-desktop/go-flutter"
-	"github.com/nealwon/go-flutter-plugin-sqlite"
+	//sqflite "github.com/davidmartos96/go-flutter-plugin-sqlite"
+	sqflite "github.com/davidmartos96/go-flutter-plugin-sqlcipher"
 	"github.com/pkg/errors"
 )
 
