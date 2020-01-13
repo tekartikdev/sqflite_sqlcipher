@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:sqflite/sqflite.dart';
@@ -14,7 +15,9 @@ import 'package:synchronized/synchronized.dart';
 
 import 'test_page.dart';
 
+/// Open callbacks.
 class OpenCallbacks {
+  /// Open callbacks.
   OpenCallbacks() {
     onConfigure = (Database db) {
       //print("onConfigure");
@@ -54,18 +57,37 @@ class OpenCallbacks {
     reset();
   }
 
+  /// true when onConfigure is called.
   bool onConfigureCalled;
+
+  /// true when onOpen is called.
   bool onOpenCalled;
+
+  /// true when onCreate is called.
   bool onCreateCalled;
+
+  /// true when onDowngrade is called.
   bool onDowngradeCalled;
+
+  /// true when onUpgrade is called.
   bool onUpgradeCalled;
 
+  /// onCreate callback.
   OnDatabaseCreateFn onCreate;
+
+  /// onConfigure callback.
   OnDatabaseConfigureFn onConfigure;
+
+  /// onDowngrade callback.
   OnDatabaseVersionChangeFn onDowngrade;
+
+  /// onUpgrade callback.
   OnDatabaseVersionChangeFn onUpgrade;
+
+  /// onOpen callback.
   OnDatabaseOpenFn onOpen;
 
+  /// reset callbacks called information.
   void reset() {
     onConfigureCalled = false;
     onOpenCalled = false;
@@ -74,6 +96,7 @@ class OpenCallbacks {
     onUpgradeCalled = false;
   }
 
+  /// open the database.
   Future<Database> open(String path, {int version}) async {
     reset();
     return await databaseFactory.openDatabase(path,
@@ -87,7 +110,27 @@ class OpenCallbacks {
   }
 }
 
+/// Check if a file is a valid database file
+///
+/// An empty file is a valid empty sqlite file
+Future<bool> isDatabase(String path, {String password}) async {
+  Database db;
+  bool isDatabase = false;
+  try {
+    db = await openReadOnlyDatabase(path, password: password);
+    int version = await db.getVersion();
+    if (version != null) {
+      isDatabase = true;
+    }
+  } catch (_) {} finally {
+    await db?.close();
+  }
+  return isDatabase;
+}
+
+/// Open test page.
 class OpenTestPage extends TestPage {
+  /// Open test page.
   OpenTestPage() : super("Open tests") {
     var factory = databaseFactory;
 
@@ -181,6 +224,8 @@ class OpenTestPage extends TestPage {
     test("Simple onCreate", () async {
       // await Sqflite.devSetDebugModeOn(true);
       String path = await initDeleteDb("open_simple_on_create.db");
+      expect(await isDatabase(path), isFalse);
+
       Database db =
           await openDatabase(path, version: 1, onCreate: (db, version) async {
         Batch batch = db.batch();
@@ -197,9 +242,12 @@ class OpenTestPage extends TestPage {
           {'id': 1, 'text': 'test'}
         ];
         expect(result, expected);
+
+        expect(await isDatabase(path), isTrue);
       } finally {
         await db?.close();
       }
+      expect(await isDatabase(path), isTrue);
     });
 
     test("Open 2 databases", () async {
@@ -798,6 +846,7 @@ class OpenTestPage extends TestPage {
     });
 
     test('Open non sqlite file', () async {
+      // Kind of corruption simulation
       // await Sqflite.devSetDebugModeOn(true);
       var factory = databaseFactory;
       var path =
@@ -806,26 +855,85 @@ class OpenTestPage extends TestPage {
       await factory.deleteDatabase(path);
       // Write dummy content
       await File(path).writeAsString('dummy', flush: true);
-      // It is only 5 bytes
-      expect((await File(path).readAsBytes()).length, 5);
+      // check content
+      expect(await File(path).readAsString(), 'dummy');
 
-      var db = await factory.openDatabase(path,
-          options: OpenDatabaseOptions(version: 1));
-      try {} finally {
+      // try read-only
+      {
+        Database db;
+        try {
+          db = await factory.openDatabase(path,
+              options: OpenDatabaseOptions(readOnly: true));
+        } catch (e) {
+          print('open error');
+        }
+        try {
+          await db.getVersion();
+        } catch (e) {
+          print('getVersion error');
+        }
         await db?.close();
+
+        // check content
+        expect(await File(path).readAsString(), 'dummy');
       }
-      expect((await File(path).readAsBytes()).length, greaterThan(5));
+
+      expect(await isDatabase(path), isFalse);
+      // try read-write
+      var minExpectedSize = 1000;
+      expect(
+          (await File(path).readAsBytes()).length, lessThan(minExpectedSize));
+
+      var db = await factory.openDatabase(path);
+      if (Platform.isIOS) {
+        // On iOS it fails
+        try {
+          await db.getVersion();
+        } catch (e) {
+          print('getVersion error');
+        }
+      } else {
+        // On Android the database is re-created
+        await db.getVersion();
+      }
+      await db?.close();
+
+      if (Platform.isIOS) {
+        // On iOS it fails
+        try {
+          db = await factory.openDatabase(path,
+              options: OpenDatabaseOptions(version: 1));
+        } catch (e) {
+          print('getVersion error');
+        }
+      } else {
+        db = await factory.openDatabase(path,
+            options: OpenDatabaseOptions(version: 1));
+        // On Android the database is re-created
+        await db.getVersion();
+      }
+      await db?.close();
+
+      if (Platform.isAndroid) {
+        // Content has changed, it is a big file now!
+        expect((await File(path).readAsBytes()).length,
+            greaterThan(minExpectedSize));
+      }
     });
   }
 }
 
+/// Open helper.
 class Helper {
+  /// Open helper.
   Helper(this.path);
 
+  /// Datebase path.
   final String path;
   Database _db;
   final _lock = Lock();
 
+  /// Open the database if not done.
   Future<Database> getDb() async {
     if (_db == null) {
       await _lock.synchronized(() async {

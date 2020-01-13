@@ -1,6 +1,16 @@
-## 1.1.6+1
+## 1.1.7+3
 
-* Open database in a background thread on Android
+* Bump flutter/dart dependency version (1.9.1/2.5.0)
+* Fix hot and warm restart for opened databases on Android
+* Add code documentation, code coverage and build badges
+* Fix ios example build
+
+## 1.1.6+5
+
+* Open database in a background thread on Android.
+* Prevent database deletion on Android when opening a corrupted database in read-only.
+* Fix hot restart ROLLBACK warning
+* Fix indexed parameter binding on iOS
 
 ## 1.1.5
 

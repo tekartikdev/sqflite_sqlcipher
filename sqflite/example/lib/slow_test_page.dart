@@ -4,7 +4,9 @@ import 'package:sqflite/sqflite.dart';
 
 import 'test_page.dart';
 
+/// Slow test page.
 class SlowTestPage extends TestPage {
+  /// Slow test page.
   SlowTestPage() : super("Slow tests") {
     test("Perf 100 insert", () async {
       String path = await initDeleteDb("slow_txn_100_insert.db");
@@ -91,13 +93,14 @@ class SlowTestPage extends TestPage {
     }
   }
 
+  /// basic performance testing.
   Future perfDo(int count) async {
     String path = await initDeleteDb("pref_${count}_items.db");
     Database db = await openDatabase(path);
     try {
       await db.execute("CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT)");
 
-      Stopwatch sw = new Stopwatch()..start();
+      Stopwatch sw = Stopwatch()..start();
       Batch batch = db.batch();
 
       for (int i = 0; i < count; i++) {
@@ -106,17 +109,17 @@ class SlowTestPage extends TestPage {
       await batch.commit();
       print("sw ${sw.elapsed} insert $count items batch ");
 
-      sw = new Stopwatch()..start();
+      sw = Stopwatch()..start();
       var result = await db.query('Test');
       print("sw ${sw.elapsed} SELECT * From Test : ${result.length} items");
 
-      sw = new Stopwatch()..start();
+      sw = Stopwatch()..start();
       result =
           await db.query('Test', where: 'name LIKE ?', whereArgs: ['%item%']);
       print(
           "sw ${sw.elapsed} SELECT * FROM Test WHERE name LIKE %item% ${result.length} items");
 
-      sw = new Stopwatch()..start();
+      sw = Stopwatch()..start();
       result =
           await db.query('Test', where: 'name LIKE ?', whereArgs: ['%dummy%']);
       print(
@@ -126,6 +129,7 @@ class SlowTestPage extends TestPage {
     }
   }
 
+  /// Insert perf testing.
   Future perfInsert() async {
     String path = await initDeleteDb("slow_txn_1000_insert.db");
     Database db = await openDatabase(path);

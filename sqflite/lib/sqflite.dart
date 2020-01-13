@@ -23,6 +23,8 @@ export 'sqlite_api.dart';
 class Sqflite {
   //static MethodChannel get _channel => channel;
 
+  /// deprecated
+  @deprecated
   static Future<String> get platformVersion =>
       invokeMethod<String>(methodGetPlatformVersion);
 
@@ -54,8 +56,9 @@ class Sqflite {
     await invokeMethod<dynamic>(methodOptions, options.toMap());
   }
 
-  // Testing only
   @deprecated
+
+  /// Testing only
   static Future<void> devInvokeMethod(String method,
       [dynamic arguments]) async {
     await invokeMethod<dynamic>(method, arguments);
@@ -136,6 +139,7 @@ Future<Database> openDatabase(String path,
     OnDatabaseVersionChangeFn onUpgrade,
     OnDatabaseVersionChangeFn onDowngrade,
     OnDatabaseOpenFn onOpen,
+    String password,
     bool readOnly = false,
     bool singleInstance = true}) {
   final OpenDatabaseOptions options = OpenDatabaseOptions(
@@ -145,6 +149,7 @@ Future<Database> openDatabase(String path,
       onUpgrade: onUpgrade,
       onDowngrade: onDowngrade,
       onOpen: onOpen,
+      password: password,
       readOnly: readOnly,
       singleInstance: singleInstance);
   return databaseFactory.openDatabase(path, options: options);
@@ -153,8 +158,8 @@ Future<Database> openDatabase(String path,
 ///
 /// Open the database at a given path in read only mode
 ///
-Future<Database> openReadOnlyDatabase(String path) =>
-    openDatabase(path, readOnly: true);
+Future<Database> openReadOnlyDatabase(String path, {String password}) =>
+    openDatabase(path, readOnly: true, password: password);
 
 ///
 /// Get the default databases location.

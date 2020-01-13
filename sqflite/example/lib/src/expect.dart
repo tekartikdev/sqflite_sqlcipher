@@ -9,8 +9,10 @@ import 'package:meta/meta.dart';
 
 /// An exception thrown when a test assertion fails.
 class TestFailure {
+  /// An exception thrown when a test assertion fails.
   TestFailure(this.message);
 
+  /// Exception message
   final String message;
 
   @override
@@ -20,8 +22,8 @@ class TestFailure {
 /// The type used for functions that can be used to build up error reports
 /// upon failures in [expect].
 @Deprecated("Will be removed in 0.13.0.")
-typedef String ErrorFormatter(
-    actual, Matcher matcher, String reason, Map matchState, bool verbose);
+typedef ErrorFormatter = String Function(dynamic actual, Matcher matcher,
+    String reason, Map matchState, bool verbose);
 
 /// Assert that [actual] matches [matcher].
 ///
@@ -117,6 +119,7 @@ Future _expect(actual, matcher,
 @alwaysThrows
 void fail([String message]) => throw TestFailure(message ?? 'should fail');
 
+/// index text helper.
 String indent(String text, {String first}) {
   if (first != null) {
     return "$first $text";
@@ -124,6 +127,7 @@ String indent(String text, {String first}) {
   return "$text";
 }
 
+/// index text helper.
 String prettyPrint(dynamic text, {String first}) {
   if (first != null) {
     return "$first $text";
@@ -131,7 +135,7 @@ String prettyPrint(dynamic text, {String first}) {
   return "$text";
 }
 
-// The default error formatter.
+/// The default error formatter.
 @Deprecated("Will be removed in 0.13.0.")
 String formatFailure(Matcher expected, actual, String which, {String reason}) {
   var buffer = StringBuffer();
