@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:sqflite_common/sqflite_dev.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 import 'package:sqflite_sqlcipher_example/open_test_page.dart';
-
-import 'package:sqflite/sqflite.dart' as sqflite;
 
 import 'test_page.dart';
 
@@ -109,7 +109,25 @@ class SqlCipherTestPage extends TestPage {
       await db.close();
     });
 
-    test('Open an unencrypted database with the package sqflite', () async {
+    solo_test('Open sqflite database', () async {
+      //sqflite.databaseFactory.setLogLevel(sqflite.sqfliteLogLevelVerbose);
+      //String path = await initDeleteDb("unencrypted.db");
+
+      var db = await sqflite.openDatabase(
+        sqflite.inMemoryDatabasePath,
+        version: 1,
+        onCreate: (db, version) async {
+          var batch = db.batch();
+
+          batch
+              .execute('CREATE TABLE Test (id INTEGER PRIMARY KEY, text NAME)');
+          await batch.commit();
+        },
+      );
+      await db.close();
+    });
+    skip_test('Open an unencrypted database with the package sqflite',
+        () async {
       String path = await initDeleteDb("unencrypted.db");
 
       Database db = await sqflite.openDatabase(

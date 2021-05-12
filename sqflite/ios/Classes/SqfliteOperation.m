@@ -10,7 +10,7 @@
 #import "SqfliteSqlCipherPlugin.h"
 
 // Abstract
-@implementation SqfliteOperation
+@implementation SqfliteSqlCipherOperation
 
 - (NSString*)getMethod {
     return  nil;
@@ -36,7 +36,7 @@
 
 @end
 
-@implementation SqfliteBatchOperation
+@implementation SqfliteSqlCipherBatchOperation
 
 @synthesize dictionary, results, error, noResult, continueOnError;
 
@@ -104,13 +104,13 @@
 
 @end
 
-@implementation SqfliteMethodCallOperation
+@implementation SqfliteSqlCipherMethodCallOperation
 
 @synthesize flutterMethodCall;
 @synthesize flutterResult;
 
-+ (SqfliteMethodCallOperation*)newWithCall:(FlutterMethodCall*)flutterMethodCall result:(FlutterResult)flutterResult {
-    SqfliteMethodCallOperation* operation = [SqfliteMethodCallOperation new];
++ (SqfliteSqlCipherMethodCallOperation*)newWithCall:(FlutterMethodCall*)flutterMethodCall result:(FlutterResult)flutterResult {
+    SqfliteSqlCipherMethodCallOperation* operation = [SqfliteSqlCipherMethodCallOperation new];
     operation.flutterMethodCall = flutterMethodCall;
     operation.flutterResult = flutterResult;
     return operation;

@@ -436,7 +436,7 @@ static NSInteger _databaseOpenCount = 0;
 //
 // update
 //
-- (bool)update:(SqfliteDatabase*)database fmdb:(FMDatabase*)db operation:(SqfliteOperation*)operation {
+- (bool)update:(SqfliteSqlCipherDatabase*)database fmdb:(FMDatabase*)db operation:(SqflitSqlCiphereOperation*)operation {
     if (![self executeOrError:database fmdb:db operation:operation]) {
         return false;
     }
@@ -469,7 +469,7 @@ static NSInteger _databaseOpenCount = 0;
 //
 // execute
 //
-- (bool)execute:(SqfliteDatabase*)database fmdb:(FMDatabase*)db operation:(SqfliteOperation*)operation {
+- (bool)execute:(SqfliteSqlCipherDatabase*)database fmdb:(FMDatabase*)db operation:(SqfliteSqlCipherOperation*)operation {
     if (![self executeOrError:database fmdb:db operation:operation]) {
         return false;
     }
